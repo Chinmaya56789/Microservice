@@ -23,15 +23,15 @@ import java.util.UUID;
 public class OrderService {
 
     private OrderRepository orderRepo;
-    private WebClient webClient;
+    private WebClient.Builder webClient;
 
     public OrderResponseDTO placeOrder(OrderRequestDTO o){
             List<OrderLineItem> items=o.getOrderLineItems().stream().map(GetDTO::fromOrderLineDTO).toList();
             List<StockeCheckDTO> skus= items.stream().map(GetDTO::fromLineItemtoStockCheck).toList();
 
             //Call to Inventory Service to check Stock
-        List<UnavailableStockDTO> stockCheckResponse = webClient.post()
-                .uri("http://localhost:8082/inventory/sku-stock")
+        List<UnavailableStockDTO> stockCheckResponse = webClient.build().post()
+                .uri("http://inventory-service/inventory/sku-stock")
                 .bodyValue(skus)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<UnavailableStockDTO>>() {})
